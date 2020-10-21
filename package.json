@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node app.js",
     "devstart": "nodemon app.js",
-    "serverstart": "DEBUG=backend:* npm run devstart"
+    "serverstart": "DEBUG=backend:* npm run devstart",
+    "test": "jest",
+    "watch": "jest --watch"
   },
   "repository": {
     "type": "git",
@@ -23,6 +25,7 @@
     "express": "^4.17.1"
   },
   "devDependencies": {
+    "jest": "^26.6.0",
     "nodemon": "^2.0.6",
     "supertest": "^5.0.0"
   }
