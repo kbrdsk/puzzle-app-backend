@@ -3,6 +3,8 @@ const request = require("supertest");
 
 const apiRouter = require("./api");
 
+require("../mongoConfigTesting");
+
 app = express();
 
 app.use(express.urlencoded({ extended: false }));
