@@ -6,6 +6,7 @@ const apiRouter = require("./routes/api");
 
 const app = express();
 
+app.use(express.urlencoded({ extended: false }));
 app.use("/api", apiRouter);
 
 app.listen(process.env.PORT, () =>
