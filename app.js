@@ -4,6 +4,8 @@ const express = require("express");
 
 const apiRouter = require("./routes/api");
 
+require("./mongoConfigTesting");
+
 const app = express();
 
 app.use(express.urlencoded({ extended: false }));
