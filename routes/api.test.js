@@ -17,7 +17,6 @@ describe("student client", () => {
 			.post("/api/students")
 			.type("form")
 			.send(student)
-			//.set("Accept", "application/json")
 			.expect("Content-Type", /json/)
 			.expect(200);
 		expect(response.body.student).toMatchObject(student);
@@ -33,7 +32,7 @@ describe("student client", () => {
 			.send(student)
 			.expect(403, done);
 	});
-	xit("logging in to existing student returns JWT & student info", async (done) => {
+	it("logging in to existing student returns JWT & student info", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
 		await request(app).post("/api/students/").type("form").send(student);
 		const response = await request(app)
@@ -42,11 +41,11 @@ describe("student client", () => {
 			.send(student)
 			.expect("Content-Type", /json/)
 			.expect(200);
-		expect(response.student).toMatchObject(student);
-		expect(response.token).toBeDefined();
+		expect(response.body.student).toMatchObject(student);
+		expect(response.body.token).toBeDefined();
 		done();
 	});
-	xit("attempting to log in to non existant student returns error", async (done) => {
+	it("attempting to log in to non existant student returns error", async (done) => {
 		const student = { first: "Nonexistant", last: "Student" };
 		await request(app).post("/api/students/").type("form").send(student);
 		request(app)
@@ -55,7 +54,7 @@ describe("student client", () => {
 			.send(student)
 			.expect(404, done);
 	});
-	xit("student names are not case sensitive", async (done) => {
+	it("student names are not case sensitive", async (done) => {
 		const student = { first: "Kabirdas", last: "Henry" };
 		const studentAlt = { first: "kABIRDAS", last: "hENRY" };
 		await request(app).post("/api/students/").type("form").send(student);
@@ -71,7 +70,7 @@ describe("student client", () => {
 			.send(studentAlt)
 			.expect("Content-Type", /json/)
 			.expect(200);
-		expect(response1.student).toMatchObject(response2.student);
+		expect(response1.body.student).toMatchObject(response2.body.student);
 		done();
 	});
 	xit("getting test puzzle data requires auth", async (done) => {
