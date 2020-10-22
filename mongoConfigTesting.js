@@ -4,12 +4,10 @@ const { MongoMemoryServer } = require("mongodb-memory-server");
 const mongoServer = new MongoMemoryServer();
 
 mongoose.Promise = Promise;
-mongoServer.getConnectionString().then((mongoUri) => {
+mongoServer.getUri().then((mongoUri) => {
 	const mongooseOpts = {
-		autoReconnect: true,
-		reconnectTries: Number.MAX_VALUE,
-		reconnectInterval: 1000,
 		useNewUrlParser: true,
+		useUnifiedTopology: true,
 	};
 
 	mongoose.connect(mongoUri, mongooseOpts);
