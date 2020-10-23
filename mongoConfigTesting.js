@@ -4,7 +4,9 @@ const { MongoMemoryServer } = require("mongodb-memory-server");
 const mongoServer = new MongoMemoryServer();
 
 mongoose.Promise = Promise;
-mongoServer.getUri().then((mongoUri) => {
+
+async function dbSetup() {
+	const mongoUri = await mongoServer.getUri();
 	const mongooseOpts = {
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
@@ -19,8 +21,11 @@ mongoServer.getUri().then((mongoUri) => {
 		}
 		console.log(err);
 	});
+}
 
-	mongoose.connection.once("open", () => {
-		console.log(`MongoDB successfully connected to ${mongoUri}`);
-	});
-});
+async function dbTeardown() {
+	await mongoose.disconnect();
+	await mongoServer.stop();
+}
+
+module.exports = { dbSetup, dbTeardown };
