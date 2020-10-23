@@ -31,12 +31,12 @@ apiRouter.post("/students/:studentId/login", async (req, res) => {
 		first === req.body.first.toLowerCase() &&
 		last === req.body.last.toLowerCase();
 	if (!student) {
-		res.sendStatus(404);
+		res.status(404).send();
 	} else if (studentIsMatch) {
 		const token = jwt.sign({ student }, process.env.JWTSECRET);
 		res.json({ student, token });
 	} else {
-		res.sendStatus(403);
+		res.status(403).send();
 	}
 });
 
@@ -48,10 +48,10 @@ apiRouter.get(
 			req.token,
 			process.env.JWTSECRET
 		);
-		verifyStudent(req, res, studentData);
-		const [student] = await Student.find(studentData);
-		if (!student) res.sendStatus(404);
-		let [puzzle] = await puzzles[req.params.puzzleName].Puzzle.find({
+		if(!verifyStudent(req, res, studentData)) return res.status(403).send();
+		const student = await Student.findOne(studentData);
+		if (!student) res.status(404).send();
+		let puzzle = await puzzles[req.params.puzzleName].Puzzle.findOne({
 			puzzleId: req.params.puzzleId,
 			student: student._id,
 		});
@@ -68,20 +68,37 @@ apiRouter.put(
 	"/students/:studentId/puzzles/:puzzleName/:puzzleId/data",
 	verifyToken,
 	async (req, res) => {
-		try {
-			const { student } = jwt.verify(req.token, process.env.JWTSECRET);
-		} catch (err) {
-			res.sendStatus(403);
+		const { student: studentData } = jwt.verify(
+			req.token,
+			process.env.JWTSECRET
+		);
+		if(!verifyStudent(req, res, studentData)) return res.status(403).send();
+		const student = await Student.findOne(studentData);
+		if (!student) return res.status(404).send();
+		let puzzle = await puzzles[req.params.puzzleName].Puzzle.findOne({
+			puzzleId: req.params.puzzleId,
+			student: student._id,
+		});
+		if (!puzzle) {
+			puzzle = await puzzles[req.params.puzzleName].defaults[
+				req.params.puzzleId
+			](student);
+			await puzzle.save();
 		}
-		verifyStudent(req, res, student);
-		const [foundStudent] = await Student.find(student);
-		if (!foundStudent) res.sendStatus(404);
+		puzzle = await puzzles[req.params.puzzleName].Puzzle.findByIdAndUpdate(
+			puzzle._id,
+			{
+				workData: req.body.puzzleData,
+			},
+			{ new: true }
+		);
+		res.json({ puzzle });
 	}
 );
 
 function verifyStudent(req, res, student) {
 	const [, first, last] = req.params.studentId.match(/^(.*)_(.*)$/);
-	if (student.first !== first || student.last !== last) res.sendStatus(403);
+	return student.first === first && student.last === last;
 }
 
 function verifyToken(req, res, next) {
@@ -91,7 +108,7 @@ function verifyToken(req, res, next) {
 		req.token = bearerToken;
 		next();
 	} else {
-		res.sendStatus(403);
+		res.status(403).send();
 	}
 }
 

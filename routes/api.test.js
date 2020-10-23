@@ -7,6 +7,7 @@ const apiRouter = require("./api");
 const app = express();
 
 app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 app.use("/api", apiRouter);
 
 beforeEach(dbSetup);
@@ -110,56 +111,71 @@ describe("student client", () => {
 		expect(response.body.data).toMatchObject(defaultData);
 		done();
 	});
-	xit("putting test puzzle data", async (done) => {
+	it("putting test puzzle data", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
-		await request(app)
-			.post("/api/students/")
-			.type("form")
-			.send(student)
-			.expect(200);
-
 		const login = await request(app)
 			.post("/api/students/")
 			.type("form")
 			.send(student);
+
 		const puzzleData = { solved: true };
 
-		request(app)
+		await request(app)
 			.put("/api/students/kabirdas_henry/puzzles/Test/0/data")
-			.set("authorization", login.token)
+			.set("authorization", login.body.token)
 			.type("json")
-			.send(puzzleData)
-			.expect(200, done);
+			.send({ puzzleData })
+			.expect(200 /*done*/);
+		done();
 	});
-	xit("getting test puzzle data after change", async (done) => {
+	it("getting test puzzle data after change", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
-		await request(app)
-			.post("/api/students/")
-			.type("form")
-			.send(student)
-			.expect(200);
-
 		const login = await request(app)
 			.post("/api/students/")
 			.type("form")
 			.send(student);
+
 		const puzzleData = { solved: true };
 
 		await request(app)
 			.put("/api/students/kabirdas_henry/puzzles/Test/0/data")
-			.set("authorization", login.token)
+			.set("authorization", login.body.token)
 			.type("json")
-			.send(puzzleData)
+			.send({ puzzleData })
 			.expect(200);
 		const response = await request(app)
 			.get("/api/students/kabirdas_henry/puzzles/Test/0/data")
-			.set("authorization", login.token)
+			.set("authorization", login.body.token)
 			.expect("Content-Type", /json/)
 			.expect(200);
-		expect(response.data).toMatchObject(puzzleData);
+		expect(response.body.data).toMatchObject(puzzleData);
 		done();
 	});
-	xit("getting/putting to wrong student forbidden", async (done) => {});
+	it("getting/putting to wrong student forbidden", async (done) => {
+		const student1 = { first: "kabirdas", last: "henry" };
+		await request(app).post("/api/students").type("form").send(student1);
+
+		const student2 = { first: "naomi", last: "henry" };
+		const login = await request(app)
+			.post("/api/students")
+			.type("form")
+			.send(student2);
+
+		const puzzleData = { solved: true };
+
+		await request(app)
+			.put("/api/students/kabirdas_henry/puzzles/Test/0/data")
+			.set("authorization", login.body.token)
+			.type("json")
+			.send({ puzzleData })
+			.expect(403);
+		await request(app)
+			.get("/api/students/kabirdas_henry/puzzles/Test/0/data")
+			.set("authorization", login.body.token)
+			.expect(403);
+
+		setTimeout(() => done(), 1000);
+	});
 	xit("changing active status on puzzle", async (done) => {});
 	xit("get on /api/students verifies token & return student data", async (done) => {});
 });

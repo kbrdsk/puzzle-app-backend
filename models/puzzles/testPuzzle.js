@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const WorkDataSchema = new Schema({ solved: { type: Boolean } });
+const WorkDataSchema = { solved: { type: Boolean } };
 
 const PuzzleSchema = new Schema({
 	//puzzle info e.g. size for calcudoku
