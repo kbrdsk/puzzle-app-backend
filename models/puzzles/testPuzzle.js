@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const WorkDataSchema = { solved: { type: Boolean } };
+const WorkSchema = { solved: { type: Boolean } };
 
 const PuzzleSchema = new Schema({
 	//puzzle info e.g. size for calcudoku
 	puzzleId: { type: String, required: true },
 	title: { type: String, required: true },
 	student: { type: Schema.Types.ObjectId, ref: "Student", required: true },
-	workData: WorkDataSchema,
+	work: WorkSchema,
 });
 
 const Puzzle = mongoose.model("TestPuzzle", PuzzleSchema);
@@ -19,7 +19,7 @@ const defaults = {
 			puzzleId: "0",
 			title: "Sample",
 			student: student._id,
-			workData: { solved: false },
+			work: { solved: false },
 		}),
 };
 

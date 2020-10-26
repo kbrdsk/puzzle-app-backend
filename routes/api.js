@@ -13,67 +13,53 @@ apiRouter.post("/students", async (req, res) => {
 		first: req.body.first.toLowerCase(),
 		last: req.body.last.toLowerCase(),
 	};
-	const [foundStudent] = await Student.find(studentData);
-	if (foundStudent) {
+	if (await Student.findOne(studentData)) {
 		res.sendStatus(403);
 	} else {
 		const student = new Student(studentData);
 		student.save();
 		const token = jwt.sign({ student }, process.env.JWTSECRET);
-		res.json({ student, token });
+		res.json({ token });
 	}
 });
 
-apiRouter.post("/students/:studentId/login", async (req, res) => {
-	const [, first, last] = req.params.studentId.match(/^(.*)_(.*)$/);
-	const [student] = await Student.find({ first, last });
-	const studentIsMatch =
-		first === req.body.first.toLowerCase() &&
-		last === req.body.last.toLowerCase();
+apiRouter.post("/students/login", async (req, res) => {
+	const first = req.body.first.toLowerCase();
+	const last = req.body.last.toLowerCase();
+	const student = await Student.findOne({ first, last });
 	if (!student) {
 		res.status(404).send();
-	} else if (studentIsMatch) {
-		const token = jwt.sign({ student }, process.env.JWTSECRET);
-		res.json({ student, token });
 	} else {
-		res.status(403).send();
+		const token = jwt.sign({ student }, process.env.JWTSECRET);
+		res.json({ token });
 	}
 });
 
 apiRouter.get(
-	"/students/:studentId/puzzles/:puzzleName/:puzzleId/data",
+	"/puzzles/:puzzleName/:puzzleId",
 	verifyToken,
 	async (req, res) => {
-		const { student: studentData } = jwt.verify(
-			req.token,
-			process.env.JWTSECRET
-		);
-		if(!verifyStudent(req, res, studentData)) return res.status(403).send();
-		const student = await Student.findOne(studentData);
+		const { puzzleName, puzzleId } = req.params;
+		const student = await Student.findOne(req.student);
 		if (!student) res.status(404).send();
-		let puzzle = await puzzles[req.params.puzzleName].Puzzle.findOne({
-			puzzleId: req.params.puzzleId,
-			student: student._id,
-		});
-		if (!puzzle) {
-			puzzle = await puzzles[req.params.puzzleName].defaults[
-				req.params.puzzleId
-			](student);
-			await puzzle.save();
+		else {
+			let puzzle = await puzzles[puzzleName].Puzzle.findOne({
+				puzzleId: puzzleId,
+				student: student._id,
+			});
+			if (!puzzle) {
+				puzzle = await puzzles[puzzleName].defaults[puzzleId](student);
+				await puzzle.save();
+			}
+			res.json(puzzle);
 		}
-		res.json({ data: puzzle.workData });
 	}
 );
 apiRouter.put(
-	"/students/:studentId/puzzles/:puzzleName/:puzzleId/data",
+	"/puzzles/:puzzleName/:puzzleId",
 	verifyToken,
 	async (req, res) => {
-		const { student: studentData } = jwt.verify(
-			req.token,
-			process.env.JWTSECRET
-		);
-		if(!verifyStudent(req, res, studentData)) return res.status(403).send();
-		const student = await Student.findOne(studentData);
+		const student = await Student.findOne(req.student);
 		if (!student) return res.status(404).send();
 		let puzzle = await puzzles[req.params.puzzleName].Puzzle.findOne({
 			puzzleId: req.params.puzzleId,
@@ -87,27 +73,21 @@ apiRouter.put(
 		}
 		puzzle = await puzzles[req.params.puzzleName].Puzzle.findByIdAndUpdate(
 			puzzle._id,
-			{
-				workData: req.body.puzzleData,
-			},
+			{ work: req.body.puzzleData },
 			{ new: true }
 		);
-		res.json({ puzzle });
+		res.json(puzzle);
 	}
 );
 
-function verifyStudent(req, res, student) {
-	const [, first, last] = req.params.studentId.match(/^(.*)_(.*)$/);
-	return student.first === first && student.last === last;
-}
-
 function verifyToken(req, res, next) {
-	const bearerHeader = req.headers.authorization;
-	if (bearerHeader) {
-		const bearerToken = bearerHeader;
-		req.token = bearerToken;
+	try {
+		req.student = jwt.verify(
+			req.headers.authorization,
+			process.env.JWTSECRET
+		).student;
 		next();
-	} else {
+	} catch {
 		res.status(403).send();
 	}
 }
