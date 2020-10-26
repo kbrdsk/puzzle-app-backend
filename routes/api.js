@@ -59,19 +59,18 @@ apiRouter.put(
 	"/puzzles/:puzzleName/:puzzleId",
 	verifyToken,
 	async (req, res) => {
+		const { puzzleName, puzzleId } = req.params;
 		const student = await Student.findOne(req.student);
 		if (!student) return res.status(404).send();
-		let puzzle = await puzzles[req.params.puzzleName].Puzzle.findOne({
-			puzzleId: req.params.puzzleId,
+		let puzzle = await puzzles[puzzleName].Puzzle.findOne({
+			puzzleId,
 			student: student._id,
 		});
 		if (!puzzle) {
-			puzzle = await puzzles[req.params.puzzleName].defaults[
-				req.params.puzzleId
-			](student);
+			puzzle = await puzzles[puzzleName].defaults[puzzleId](student);
 			await puzzle.save();
 		}
-		puzzle = await puzzles[req.params.puzzleName].Puzzle.findByIdAndUpdate(
+		puzzle = await puzzles[puzzleName].Puzzle.findByIdAndUpdate(
 			puzzle._id,
 			{ work: req.body.puzzleData },
 			{ new: true }
