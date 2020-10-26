@@ -10,6 +10,7 @@ async function dbSetup() {
 	const mongooseOpts = {
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
+		useFindAndModify: false,
 	};
 
 	mongoose.connect(mongoUri, mongooseOpts);
