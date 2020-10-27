@@ -20,8 +20,8 @@ describe("student client", () => {
 		const student = { first: "kabirdas", last: "henry" };
 		const response = await request(app)
 			.post("/api/students")
-			.type("form")
-			.send(student)
+			.type("application/json")
+			.send(JSON.stringify(student))
 			.expect("Content-Type", /json/)
 			.expect(200);
 		expect(jwt.decode(response.body.token).student).toMatchObject(student);
@@ -29,20 +29,26 @@ describe("student client", () => {
 	});
 	it("attempting to create an existing student returns error", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
-		await request(app).post("/api/students/").type("form").send(student);
+		await request(app)
+			.post("/api/students/")
+			.type("application/json")
+			.send(JSON.stringify(student));
 		request(app)
 			.post("/api/students")
-			.type("form")
-			.send(student)
+			.type("application/json")
+			.send(JSON.stringify(student))
 			.expect(403, done);
 	});
 	it("logging in to existing student returns JWT with student info", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
-		await request(app).post("/api/students/").type("form").send(student);
+		await request(app)
+			.post("/api/students/")
+			.type("application/json")
+			.send(JSON.stringify(student));
 		const response = await request(app)
 			.post("/api/students/login")
-			.type("form")
-			.send(student)
+			.type("application/json")
+			.send(JSON.stringify(student))
 			.expect("Content-Type", /json/)
 			.expect(200);
 		expect(jwt.decode(response.body.token).student).toMatchObject(student);
@@ -52,24 +58,27 @@ describe("student client", () => {
 		const student = { first: "Nonexistant", last: "Student" };
 		request(app)
 			.post("/api/students/login")
-			.type("form")
-			.send(student)
+			.type("application/json")
+			.send(JSON.stringify(student))
 			.expect(404, done);
 	});
 	it("student names are not case sensitive", async (done) => {
 		const student = { first: "Kabirdas", last: "Henry" };
 		const studentAlt = { first: "kABIRDAS", last: "hENRY" };
-		await request(app).post("/api/students/").type("form").send(student);
+		await request(app)
+			.post("/api/students/")
+			.type("application/json")
+			.send(JSON.stringify(student));
 		const response1 = await request(app)
 			.post("/api/students/login")
-			.type("form")
-			.send(student)
+			.type("application/json")
+			.send(JSON.stringify(student))
 			.expect(200)
 			.expect("Content-Type", /json/);
 		const response2 = await request(app)
 			.post("/api/students/login")
-			.type("form")
-			.send(studentAlt)
+			.type("application/json")
+			.send(JSON.stringify(studentAlt))
 			.expect(200)
 			.expect("Content-Type", /json/);
 		expect(jwt.decode(response1.body.token).student).toMatchObject(
@@ -79,13 +88,19 @@ describe("student client", () => {
 	});
 	it("getting test puzzle work requires auth", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
-		await request(app).post("/api/students/").type("form").send(student);
+		await request(app)
+			.post("/api/students/")
+			.type("application/json")
+			.send(JSON.stringify(student));
 		request(app).get("/api/puzzles/Test/0").expect(403, done);
 	});
 	it("putting test puzzle work requires auth", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
 		const puzzleData = { solved: true };
-		await request(app).post("/api/students/").type("form").send(student);
+		await request(app)
+			.post("/api/students/")
+			.type("application/json")
+			.send(JSON.stringify(student));
 		request(app)
 			.put("/api/puzzles/Test/0")
 			.type("json")
@@ -96,8 +111,8 @@ describe("student client", () => {
 		const student = { first: "kabirdas", last: "henry" };
 		const login = await request(app)
 			.post("/api/students")
-			.type("form")
-			.send(student);
+			.type("application/json")
+			.send(JSON.stringify(student));
 
 		const defaultData = { solved: false };
 
@@ -114,8 +129,8 @@ describe("student client", () => {
 		const student = { first: "kabirdas", last: "henry" };
 		const login = await request(app)
 			.post("/api/students/")
-			.type("form")
-			.send(student);
+			.type("application/json")
+			.send(JSON.stringify(student));
 
 		const puzzleData = { solved: true };
 
@@ -131,8 +146,8 @@ describe("student client", () => {
 		const student = { first: "kabirdas", last: "henry" };
 		const login = await request(app)
 			.post("/api/students/")
-			.type("form")
-			.send(student);
+			.type("application/json")
+			.send(JSON.stringify(student));
 
 		const puzzleData = { solved: true };
 
