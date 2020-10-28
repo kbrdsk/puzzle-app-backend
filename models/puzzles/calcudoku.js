@@ -8,7 +8,7 @@ const PuzzleSchema = new Schema({
 		{
 			operation: {
 				type: String,
-				enum: ["+", "-", "/", "*", ""]
+				enum: ["+", "-", "/", "*", ""],
 			},
 			squares: [
 				{
@@ -28,6 +28,7 @@ const PuzzleSchema = new Schema({
 			value: Number,
 		},
 	],
+	source: String,
 });
 
 const Puzzle = mongoose.model("Calcudoku", PuzzleSchema);
