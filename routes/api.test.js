@@ -165,4 +165,115 @@ describe("student client", () => {
 		expect(response.body.work).toMatchObject(puzzleData);
 		done();
 	});
+	it("get default sample calcudoku", async (done) => {
+		const student = { first: "kabirdas", last: "henry" };
+		const login = await request(app)
+			.post("/api/students")
+			.type("application/json")
+			.send(JSON.stringify(student));
+
+		const defaultData = {
+			size: 4,
+			title: "Sample",
+			cages: [
+				{
+					operation: "+",
+					result: 9,
+					squares: [
+						{ col: 0, row: 0 },
+						{ col: 1, row: 0 },
+						{ col: 1, row: 1 },
+					],
+				},
+				{
+					operation: "+",
+					result: 8,
+					squares: [
+						{ col: 0, row: 1 },
+						{ col: 0, row: 2 },
+						{ col: 0, row: 3 },
+					],
+				},
+				{
+					operation: "",
+					result: 1,
+					squares: [{ col: 2, row: 0 }],
+				},
+				{
+					operation: "-",
+					result: 1,
+					squares: [
+						{ col: 1, row: 2 },
+						{ col: 1, row: 3 },
+					],
+				},
+				{
+					operation: "+",
+					result: 5,
+					squares: [
+						{ col: 2, row: 1 },
+						{ col: 2, row: 2 },
+					],
+				},
+				{
+					operation: "-",
+					result: 1,
+					squares: [
+						{ col: 2, row: 3 },
+						{ col: 3, row: 3 },
+					],
+				},
+				{
+					operation: "+",
+					result: 5,
+					squares: [
+						{ col: 3, row: 0 },
+						{ col: 3, row: 1 },
+					],
+				},
+				{
+					operation: "",
+					result: 2,
+					squares: [{ col: 3, row: 2 }],
+				},
+			],
+		};
+
+		const response = await request(app)
+			.get("/api/puzzles/calcudoku/sample")
+			.set("authorization", login.body.token)
+			.expect(200)
+			.expect("Content-Type", /json/);
+
+		expect(response.body).toMatchObject(defaultData);
+		done();
+	});
+	it("changing calcudoku work", async (done) => {
+		const student = { first: "kabirdas", last: "henry" };
+		const login = await request(app)
+			.post("/api/students/")
+			.type("application/json")
+			.send(JSON.stringify(student));
+
+		const puzzleData = [
+			{ col: 0, row: 0, value: 2 },
+			{ col: 1, row: 0, value: 3 },
+			{ col: 2, row: 0, value: 1 },
+			{ col: 3, row: 0, value: 4 },
+		];
+
+		await request(app)
+			.put("/api/puzzles/calcudoku/sample")
+			.set("authorization", login.body.token)
+			.type("json")
+			.send({ puzzleData })
+			.expect(200);
+		const response = await request(app)
+			.get("/api/puzzles/calcudoku/sample")
+			.set("authorization", login.body.token)
+			.expect("Content-Type", /json/)
+			.expect(200);
+		expect(response.body.work).toMatchObject(puzzleData);
+		done();
+	});
 });
