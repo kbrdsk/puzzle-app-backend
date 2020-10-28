@@ -22,7 +22,8 @@ apiRouter.post("/students", async (req, res) => {
 			const token = jwt.sign({ student }, process.env.JWTSECRET);
 			res.json({ token });
 		}
-	} catch {
+	} catch (error) {
+		console.log(error);
 		res.status(500).send();
 	}
 });
@@ -38,7 +39,8 @@ apiRouter.post("/students/login", async (req, res) => {
 			const token = jwt.sign({ student }, process.env.JWTSECRET);
 			res.json({ token });
 		}
-	} catch {
+	} catch (error) {
+		console.log(error);
 		res.status(500).send();
 	}
 });
@@ -64,7 +66,8 @@ apiRouter.get(
 				}
 				res.json(puzzle);
 			}
-		} catch {
+		} catch (error) {
+			console.log(error);
 			res.status(500).send();
 		}
 	}
@@ -91,7 +94,8 @@ apiRouter.put(
 				{ new: true }
 			);
 			res.json(puzzle);
-		} catch {
+		} catch (error) {
+			console.log(error);
 			res.status(500).send();
 		}
 	}
@@ -104,7 +108,8 @@ function verifyToken(req, res, next) {
 			process.env.JWTSECRET
 		).student;
 		next();
-	} catch {
+	} catch (error) {
+		console.log(error);
 		res.status(403).send();
 	}
 }
