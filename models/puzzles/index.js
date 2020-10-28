@@ -1,1 +1,4 @@
-module.exports = { Test: require("./testPuzzle") };
+module.exports = {
+	Test: require("./testPuzzle"),
+	calcudoku: require("./calcudoku"),
+};
