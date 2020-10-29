@@ -276,4 +276,18 @@ describe("student client", () => {
 		expect(response.body.work).toMatchObject(puzzleData);
 		done();
 	});
+	it("getting calcudoku instance list", async (done) => {
+		const student = { first: "kabirdas", last: "henry" };
+		const login = await request(app)
+			.post("/api/students/")
+			.type("application/json")
+			.send(JSON.stringify(student));
+
+		const response = await request(app)
+			.get("/api/puzzles/calcudoku")
+			.set("authorization", login.body.token)
+			.expect(200);
+		expect(response.body).toEqual(expect.arrayContaining([]));
+		done();
+	});
 });
