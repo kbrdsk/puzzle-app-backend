@@ -45,6 +45,16 @@ apiRouter.post("/students/login", async (req, res) => {
 	}
 });
 
+apiRouter.get("/puzzles/:puzzleName", verifyToken, async (req, res) => {
+	try {
+		const { puzzleName } = req.params;
+		const puzzleList = Object.keys(puzzles[puzzleName].defaults);
+		res.json(puzzleList);
+	} catch (error) {
+		console.log(error);
+		res.status(500).send();
+	}
+});
 apiRouter.get(
 	"/puzzles/:puzzleName/:puzzleId",
 	verifyToken,
