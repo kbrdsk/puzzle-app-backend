@@ -366,7 +366,7 @@ describe("student client", () => {
 		done();
 	});
 
-	xit("resetting active puzzle", async (done) => {
+	it("resetting active puzzle", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
 		const puzzleInfo = { puzzleName: "calcudoku", puzzleId: "sample" };
 		const login = await request(app)
