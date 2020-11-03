@@ -28,11 +28,16 @@ apiRouter.post("/students", async (req, res) => {
 	}
 });
 apiRouter.get("/students", verifyInstructorPW, async (req, res) => {
-	const findResult = await Student.find({}, "first last").exec();
-	const students = findResult.map((student) => {
-		return { first: student.first, last: student.last };
-	});
-	res.send(students);
+	try {
+		const findResult = await Student.find({}, "first last").exec();
+		const students = findResult.map((student) => {
+			return { first: student.first, last: student.last };
+		});
+		res.send(students);
+	} catch (error) {
+		console.log(error);
+		res.status(500).send();
+	}
 });
 
 apiRouter.post("/students/login", async (req, res) => {
@@ -45,6 +50,68 @@ apiRouter.post("/students/login", async (req, res) => {
 		} else {
 			const token = jwt.sign({ student }, process.env.JWTSECRET);
 			res.json({ token });
+		}
+	} catch (error) {
+		console.log(error);
+		res.status(500).send();
+	}
+});
+
+apiRouter.get(
+	"/students/:studentID/activepuzzle",
+	verifyInstructorPW,
+	async (req, res) => {
+		try {
+			const [, first, last] = req.params.studentID.match(/^(.*)_(.*)$/);
+			const student = await Student.findOne({ first, last });
+			if (!student) res.status(404).send();
+			else {
+				const { puzzleName, puzzleId } = student.activepuzzle;
+				if (!puzzleName || !puzzleId)
+					res.json({ puzzleName, puzzleId });
+				let puzzle = await puzzles[puzzleName].Puzzle.findOne({
+					puzzleId: puzzleId,
+					student: student._id,
+				});
+				if (!puzzle) {
+					puzzle = await puzzles[puzzleName].defaults[puzzleId](
+						student
+					);
+					await puzzle.save();
+				}
+				const puzzleData = Object.assign({ puzzleName }, puzzle._doc);
+				res.json(puzzleData);
+			}
+		} catch (error) {
+			console.log(error);
+			res.status(500).send();
+		}
+	}
+);
+
+apiRouter.put("/activepuzzle", verifyToken, async (req, res) => {
+	try {
+		const student = await Student.findOne(req.student);
+		if (!student) res.status(404).send();
+		else {
+			const { puzzleName, puzzleId } = req.body;
+			student.activepuzzle = { puzzleName, puzzleId };
+			await student.save();
+			res.sendStatus(200);
+		}
+	} catch (error) {
+		console.log(error);
+		res.status(500).send();
+	}
+});
+apiRouter.delete("/activepuzzle", verifyToken, async (req, res) => {
+	try {
+		const student = await Student.findOne(req.student);
+		if (!student) res.status(404).send();
+		else {
+			student.activepuzzle = { puzzleName: null, puzzleId: null };
+			await student.save();
+			res.sendStatus(200);
 		}
 	} catch (error) {
 		console.log(error);
