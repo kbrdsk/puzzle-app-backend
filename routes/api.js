@@ -27,6 +27,13 @@ apiRouter.post("/students", async (req, res) => {
 		res.status(500).send();
 	}
 });
+apiRouter.get("/students", verifyInstructorPW, async (req, res) => {
+	const findResult = await Student.find({}, "first last").exec();
+	const students = findResult.map((student) => {
+		return { first: student.first, last: student.last };
+	});
+	res.send(students);
+});
 
 apiRouter.post("/students/login", async (req, res) => {
 	try {
@@ -122,6 +129,11 @@ function verifyToken(req, res, next) {
 		console.log(error);
 		res.status(403).send();
 	}
+}
+
+function verifyInstructorPW(req, res, next) {
+	if (req.headers.authorization === process.env.INSTRUCTOR_PW) next();
+	else res.status(403).send();
 }
 
 module.exports = apiRouter;
