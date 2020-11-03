@@ -351,7 +351,7 @@ describe("student client", () => {
 			.get(`/api/students/${student.first}_${student.last}/activepuzzle`)
 			.set("authorization", process.env.INSTRUCTOR_PW);
 
-		//expect(response.body.puzzleName).toBe("calcudoku");
+		expect(response.body.puzzleName).toBe("calcudoku");
 		expect(response.body.puzzleId).toBe("sample");
 		expect(Object.keys(response.body)).toEqual(
 			expect.arrayContaining([
