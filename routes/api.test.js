@@ -290,4 +290,110 @@ describe("student client", () => {
 		expect(response.body).toEqual(expect.arrayContaining([]));
 		done();
 	});
+
+	it("getting student list requires auth", async (done) => {
+		request(app).get("/api/students/").expect(403, done);
+	});
+
+	it("getting student list", async (done) => {
+		const student1 = { first: "kabirdas", last: "henry" };
+		const student2 = { first: "naomi", last: "henry" };
+		await Promise.all([
+			request(app)
+				.post("/api/students/")
+				.type("application/json")
+				.send(JSON.stringify(student1)),
+			request(app)
+				.post("/api/students/")
+				.type("application/json")
+				.send(JSON.stringify(student2)),
+		]);
+
+		const response = await request(app)
+			.get("/api/students/")
+			.set("authorization", process.env.INSTRUCTOR_PW);
+
+		expect(response.body).toEqual(
+			expect.arrayContaining([student1, student2])
+		);
+
+		done();
+	});
+
+	it("getting active puzzle requires auth", async (done) => {
+		request(app)
+			.get(`/api/students/doesnt_matter/activepuzzle`)
+			.expect(403, done);
+	});
+
+	it("getting active puzzle for nonexistant student", async (done) => {
+		request(app)
+			.get(`/api/students/doesnt_exist/activepuzzle`)
+			.set("authorization", process.env.INSTRUCTOR_PW)
+			.expect(404, done);
+	});
+
+	it("getting and setting active puzzle", async (done) => {
+		const student = { first: "kabirdas", last: "henry" };
+		const puzzleInfo = { puzzleName: "calcudoku", puzzleId: "sample" };
+		const login = await request(app)
+			.post("/api/students/")
+			.type("application/json")
+			.send(JSON.stringify(student));
+		await request(app)
+			.put("/api/activepuzzle")
+			.set("authorization", login.body.token)
+			.type("application/json")
+			.send(JSON.stringify(puzzleInfo))
+			.expect(200);
+
+		const response = await request(app)
+			.get(`/api/students/${student.first}_${student.last}/activepuzzle`)
+			.set("authorization", process.env.INSTRUCTOR_PW);
+
+		expect(response.body.puzzleName).toBe("calcudoku");
+		expect(response.body.puzzleId).toBe("sample");
+		expect(Object.keys(response.body)).toEqual(
+			expect.arrayContaining([
+				"title",
+				"cages",
+				"work",
+				"size",
+				"student",
+				"source",
+			])
+		);
+
+		done();
+	});
+
+	xit("resetting active puzzle", async (done) => {
+		const student = { first: "kabirdas", last: "henry" };
+		const puzzleInfo = { puzzleName: "calcudoku", puzzleId: "sample" };
+		const login = await request(app)
+			.post("/api/students/")
+			.type("application/json")
+			.send(JSON.stringify(student));
+		await request(app)
+			.put("/api/activepuzzle")
+			.set("authorization", login.body.token)
+			.type("application/json")
+			.send(JSON.stringify(puzzleInfo))
+			.expect(200);
+
+		await request(app)
+			.delete("/api/activepuzzle")
+			.set("authorization", login.body.token)
+			.type("application/json")
+			.expect(200);
+
+		const response = await request(app)
+			.get(`/api/students/${student.first}_${student.last}/activepuzzle`)
+			.set("authorization", process.env.INSTRUCTOR_PW);
+
+		expect(response.body.puzzleName).toBe(null);
+		expect(response.body.puzzleId).toBe(null);
+
+		done();
+	});
 });
