@@ -69,18 +69,23 @@ apiRouter.get(
 				const { puzzleName, puzzleId } = student.activepuzzle;
 				if (!puzzleName || !puzzleId)
 					res.json({ puzzleName, puzzleId });
-				let puzzle = await puzzles[puzzleName].Puzzle.findOne({
-					puzzleId: puzzleId,
-					student: student._id,
-				});
-				if (!puzzle) {
-					puzzle = await puzzles[puzzleName].defaults[puzzleId](
-						student
+				else {
+					let puzzle = await puzzles[puzzleName].Puzzle.findOne({
+						puzzleId: puzzleId,
+						student: student._id,
+					});
+					if (!puzzle) {
+						puzzle = await puzzles[puzzleName].defaults[puzzleId](
+							student
+						);
+						await puzzle.save();
+					}
+					const puzzleData = Object.assign(
+						{ puzzleName },
+						puzzle._doc
 					);
-					await puzzle.save();
+					res.json(puzzleData);
 				}
-				const puzzleData = Object.assign({ puzzleName }, puzzle._doc);
-				res.json(puzzleData);
 			}
 		} catch (error) {
 			console.log(error);
