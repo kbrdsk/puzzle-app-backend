@@ -11,13 +11,11 @@ const { dbSetup } = require("./mongoConfigTesting");
 
 const app = express();
 
-app.configure("development", () => {
+if (process.env.NODE_ENV === "development") {
 	dbSetup();
-});
-
-app.configure("production", "staging", () => {
+} else {
 	require("./mongoConfig");
-});
+}
 
 app.use(helmet());
 app.use(compression());
