@@ -9,18 +9,24 @@ const apiRouter = require("./routes/api");
 
 const { dbSetup } = require("./mongoConfigTesting");
 
-dbSetup().then(() => {
-	const app = express();
+const app = express();
 
-	app.use(helmet());
-	app.use(compression());
-
-	app.use(express.urlencoded({ extended: false }));
-	app.use(express.json());
-	app.use(cors());
-	app.use("/api", apiRouter);
-
-	app.listen(process.env.PORT, () =>
-		console.log(`App listening on port ${process.env.PORT}`)
-	);
+app.configure("development", () => {
+	dbSetup();
 });
+
+app.configure("production", "staging", () => {
+	require("./mongoConfig");
+});
+
+app.use(helmet());
+app.use(compression());
+
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(cors());
+app.use("/api", apiRouter);
+
+app.listen(process.env.PORT, () =>
+	console.log(`App listening on port ${process.env.PORT}`)
+);
