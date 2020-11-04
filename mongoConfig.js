@@ -8,5 +8,5 @@ const mongooseOpts = {
 };
 
 mongoose.connect(mongoDb, mongooseOpts);
-const db = mongoose.connect;
-db.on("erro", console.error.bind(console, "mongo connection error"));
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "mongo connection error"));
