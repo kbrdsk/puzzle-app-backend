@@ -13,8 +13,7 @@ const { populateTestDB } = require("./populatedb");
 const app = express();
 
 if (process.env.NODE_ENV === "development") {
-	const db = dbSetup();
-	populateTestDB(db);
+	dbSetup().then(populateTestDB);
 } else {
 	require("./mongoConfig");
 }
