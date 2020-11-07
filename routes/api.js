@@ -148,7 +148,7 @@ apiRouter.delete("/activepuzzle", verifyToken, async (req, res) => {
 	}
 });
 
-apiRouter.get("/puzzles/:puzzleName", verifyToken, async (req, res) => {
+apiRouter.get("/puzzles/:puzzleName", async (req, res) => {
 	try {
 		const { puzzleName } = req.params;
 		const defaults = await puzzles[puzzleName].find({ default: true });
