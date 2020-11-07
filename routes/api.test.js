@@ -399,4 +399,32 @@ describe("student client", () => {
 
 		done();
 	});
+
+	it("getting non-active puzzle", async (done) => {
+		const student = { first: "kabirdas", last: "henry" };
+		const login = await request(app)
+			.post("/api/students/")
+			.type("application/json")
+			.send(JSON.stringify(student));
+
+		const response = await request(app)
+			.get(
+				`/api/students/${student.first}_${student.last}/calcudoku/sample`
+			)
+			.set("authorization", process.env.INSTRUCTOR_PW);
+
+		expect(response.body.puzzleName).toBe("calcudoku");
+		expect(response.body.puzzleId).toBe("sample");
+		expect(Object.keys(response.body)).toEqual(
+			expect.arrayContaining([
+				"title",
+				"cages",
+				"work",
+				"size",
+				"student",
+			])
+		);
+
+		done();
+	});
 });

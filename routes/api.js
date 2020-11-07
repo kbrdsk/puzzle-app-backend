@@ -92,6 +92,28 @@ apiRouter.get(
 	}
 );
 
+apiRouter.get(
+	"/students/:studentID/:puzzleName/:puzzleId",
+	verifyInstructorPW,
+	async (req, res) => {
+		try {
+			const { puzzleName, puzzleId, studentID } = req.params;
+			const [, first, last] = studentID.match(/^(.*)_(.*)$/);
+			const student = await Student.findOne({ first, last });
+			if (!student) {
+				res.status(404).send("Student not found.");
+			} else {
+				const puzzle = await getPuzzle(puzzleName, puzzleId, student);
+				const puzzleData = Object.assign({ puzzleName }, puzzle._doc);
+				res.json(puzzleData);
+			}
+		} catch (error) {
+			console.log(error);
+			res.status(500).send();
+		}
+	}
+);
+
 apiRouter.put("/activepuzzle", verifyToken, async (req, res) => {
 	try {
 		const student = await Student.findOne({ _id: req.student._id });
