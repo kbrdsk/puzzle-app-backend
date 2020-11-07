@@ -1,7 +1,7 @@
 const Student = require("./models/student");
 const PuzzleIndex = require("./models/puzzles/index");
 
-module.exports.populateTestDB = async (cb, mongoDB) => {
+module.exports.populateTestDB = async (mongoDB) => {
 	if (mongoDB) {
 		const mongoose = require("mongoose");
 		mongoose.connect(mongoDB, { useNewUrlParser: true });
@@ -59,7 +59,6 @@ module.exports.populateTestDB = async (cb, mongoDB) => {
 			puzzleId: "sample",
 			title: "Sample",
 			student: null,
-			work: [{ col: 0, row: 0, value: 1 }],
 			size: 4,
 			cages: [
 				{
