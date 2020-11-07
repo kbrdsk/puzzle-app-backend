@@ -2,6 +2,7 @@ const express = require("express");
 const request = require("supertest");
 const jwt = require("jsonwebtoken");
 const { dbSetup, dbTeardown } = require("../mongoConfigTesting");
+const { populateTestDB } = require("../populatedb.js");
 
 const apiRouter = require("./api");
 
@@ -11,7 +12,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use("/api", apiRouter);
 
-beforeEach(dbSetup);
+beforeEach(async () => {
+	await dbSetup();
+	await populateTestDB();
+});
 
 afterEach(dbTeardown);
 

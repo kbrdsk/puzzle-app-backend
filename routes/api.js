@@ -8,6 +8,8 @@ const puzzles = require("../models/puzzles/index");
 
 const apiRouter = express.Router();
 
+const { ObjectID } = require("mongodb");
+
 apiRouter.post("/students", async (req, res) => {
 	try {
 		const studentData = {
@@ -71,16 +73,11 @@ apiRouter.get(
 				if (!puzzleName || !puzzleId)
 					res.json({ puzzleName, puzzleId });
 				else {
-					let puzzle = await puzzles[puzzleName].Puzzle.findOne({
-						puzzleId: puzzleId,
-						student: student._id,
-					});
-					if (!puzzle) {
-						puzzle = await puzzles[puzzleName].defaults[puzzleId](
-							student
-						);
-						await puzzle.save();
-					}
+					const puzzle = await getPuzzle(
+						puzzleName,
+						puzzleId,
+						student
+					);
 					const puzzleData = Object.assign(
 						{ puzzleName },
 						puzzle._doc
@@ -132,7 +129,8 @@ apiRouter.delete("/activepuzzle", verifyToken, async (req, res) => {
 apiRouter.get("/puzzles/:puzzleName", verifyToken, async (req, res) => {
 	try {
 		const { puzzleName } = req.params;
-		const puzzleList = Object.keys(puzzles[puzzleName].defaults);
+		const defaults = await puzzles[puzzleName].find({ default: true });
+		const puzzleList = defaults.map((puzzle) => puzzle.puzzleId);
 		res.json(puzzleList);
 	} catch (error) {
 		console.log(error);
@@ -149,16 +147,7 @@ apiRouter.get(
 			if (!student) {
 				res.status(404).send("Student not found.");
 			} else {
-				let puzzle = await puzzles[puzzleName].Puzzle.findOne({
-					puzzleId: puzzleId,
-					student: student._id,
-				});
-				if (!puzzle) {
-					puzzle = await puzzles[puzzleName].defaults[puzzleId](
-						student
-					);
-					await puzzle.save();
-				}
+				const puzzle = await getPuzzle(puzzleName, puzzleId, student);
 				res.json(puzzle);
 			}
 		} catch (error) {
@@ -177,15 +166,8 @@ apiRouter.put(
 			if (!student) {
 				res.status(404).send("Student not found.");
 			}
-			let puzzle = await puzzles[puzzleName].Puzzle.findOne({
-				puzzleId,
-				student: student._id,
-			});
-			if (!puzzle) {
-				puzzle = await puzzles[puzzleName].defaults[puzzleId](student);
-				await puzzle.save();
-			}
-			puzzle = await puzzles[puzzleName].Puzzle.findByIdAndUpdate(
+			let puzzle = await getPuzzle(puzzleName, puzzleId, student);
+			puzzle = await puzzles[puzzleName].findByIdAndUpdate(
 				puzzle._id,
 				{ work: req.body.puzzleData },
 				{ new: true }
@@ -214,6 +196,27 @@ function verifyToken(req, res, next) {
 function verifyInstructorPW(req, res, next) {
 	if (req.headers.authorization === process.env.INSTRUCTOR_PW) next();
 	else res.status(403).send();
+}
+
+async function getPuzzle(puzzleName, puzzleId, student) {
+	const Puzzle = puzzles[puzzleName];
+	let puzzle = await Puzzle.findOne({
+		puzzleId,
+		student: student._id,
+	});
+	if (!puzzle) {
+		puzzle = await Puzzle.findOne({
+			puzzleId,
+			default: true,
+		});
+		puzzle._id = new ObjectID();
+		puzzle.student = student._id;
+		puzzle.default = false;
+		puzzle.isNew = true;
+		await puzzle.save();
+	}
+
+	return puzzle;
 }
 
 module.exports = apiRouter;
