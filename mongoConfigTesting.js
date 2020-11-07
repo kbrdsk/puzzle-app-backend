@@ -22,6 +22,8 @@ async function dbSetup() {
 		}
 		console.log(err);
 	});
+
+	return mongoUri;
 }
 
 async function dbTeardown() {
