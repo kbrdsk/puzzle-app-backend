@@ -1,6 +1,7 @@
 const Student = require("./models/student");
 const PuzzleIndex = require("./models/puzzles/index");
 const calcudokuDefaults = require("./defaults/calcudoku").defaults;
+const studentDefaults = require("./defaults/students").defaults;
 
 module.exports.populateTestDB = async (mongoDB) => {
 	if (mongoDB) {
@@ -37,23 +38,9 @@ module.exports.populateTestDB = async (mongoDB) => {
 		}
 	}
 
-	const studentData = () => [
-		{ populateID: "kabirdas", first: "kabirdas", last: "vangelder" },
-		{ populateID: "naomi", first: "naomi", last: "vangelder" },
-	];
+	const studentData = () => studentDefaults;
 
-	const puzzleData = () => [
-		{
-			default: true,
-			puzzleName: "Test",
-			populateID: "test-default",
-			puzzleId: "0",
-			title: "Sample",
-			student: null,
-			work: { solved: false },
-		},
-		...calcudokuDefaults,
-	];
+	const puzzleData = () => [...calcudokuDefaults];
 
 	try {
 		await Promise.all(studentData().map(createStudent));
