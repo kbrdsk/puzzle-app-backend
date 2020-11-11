@@ -123,6 +123,12 @@ As it turns out, the one who ate the cookie is lying. Who ate the cookie?
     description: "Three people are lined up so that they can only see the people standing in front of them. There are a total of 5 hats, 2 are black, 3 are white. Each person has one of the hats put on their head without seeing what color it is. Starting from the back they all try to guess what color hat they’re wearing.
 /n/n
 The last person in the line (who can see the two people in front of them) says, “It’s impossible for me to figure out what color hat I’m wearing.”
+/n/n
+	  The next person in the line (who can only see the one person in front of them) says, “It’s impossible for me to figure out what color hat I’m wearing.”
+/n/n
+The next person in the line (who can’t see anybody else) says, “I know what color hat I’m wearing”.
+/n/n
+What color is their hat?
 ",
     default: true,
     puzzleName: "logic",
