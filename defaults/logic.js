@@ -16,7 +16,7 @@ The farmer's challenge was to carry herself and her purchases to the far bank of
     puzzleId: "torch",
     title: "Bridge & Torch",
     description:
-      "Four people come to a river in the night. There is a narrow bridge, but it can only hold two people at a time. They have one torch and, because it's night, the torch has to be used when crossing the bridge. Person A can cross the bridge in 1 minute, B in 2 minutes, C in 5 minutes, and D in 8 minutes. When two people cross the bridge together, they must move at the slower person's pace. The question is, can they all get across the bridge if the torch lasts only 15 minutes?",
+      "Four people come to a river in the night. There is a narrow bridge, but it can only hold two people at a time. They have one torch and, because it's night, the torch has to be used when crossing the bridge. They cross the bridge at the following speeds: \n\n A in 1 minute\n B in 2 minutes\n C in 5 minutes\n D in 8 minutes\n\n When two people cross the bridge together, they must move at the slower person's pace. The question is, can they all get across the bridge if the torch lasts only 15 minutes?",
     default: true,
     puzzleName: "logic",
     student: null,
@@ -115,7 +115,7 @@ As it turns out, the one who ate the cookie is lying. Who ate the cookie?
     puzzleId: "rockpaperscissors",
     title: "Rock, Paper, Scissors",
     description:
-      "Angel and Bianca played rock paper scissors 10 times. We know how many times each of them threw rock, paper, and scissors, but we don’t know the order, all we know is that there were no ties. Angel threw rock 2 times, paper 4 times, and scissors 4 times. Bianca threw rock 3 times, paper 1 time, and scissors 6 times. What was the score?",
+      "Angel and Bianca played rock paper scissors 10 times. We know how many times each of them threw rock, paper, and scissors, but we don’t know the order, all we know is that there were no ties.\n\nAngel threw rock 2 times, paper 4 times, and scissors 4 times.\nBianca threw rock 3 times, paper 1 time, and scissors 6 times.\n\nWhat was the score?",
     default: true,
     puzzleName: "logic",
     student: null,
@@ -128,7 +128,7 @@ As it turns out, the one who ate the cookie is lying. Who ate the cookie?
 
 The last person in the line (who can see the two people in front of them) says, “It’s impossible for me to figure out what color hat I’m wearing.”
 
-    The next person in the line (who can only see the one person in front of them) says, “It’s impossible for me to figure out what color hat I’m wearing.”
+The next person in the line (who can only see the one person in front of them) says, “It’s impossible for me to figure out what color hat I’m wearing.”
 
 The next person in the line (who can’t see anybody else) says, “I know what color hat I’m wearing”.
 
