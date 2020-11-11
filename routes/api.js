@@ -151,14 +151,20 @@ apiRouter.delete("/activepuzzle", verifyToken, async (req, res) => {
 apiRouter.get("/puzzles/:puzzleName", async (req, res) => {
 	try {
 		const { puzzleName } = req.params;
-		const defaults = await puzzles[puzzleName].find({ default: true });
-		const puzzleList = defaults.map((puzzle) => puzzle.puzzleId);
+		const defaults = await puzzles[puzzleName].find(
+			{ default: true },
+			"puzzleId title"
+		);
+		const puzzleList = defaults.map(({ puzzleId, title }) => {
+			return { instance: puzzleId, title };
+		});
 		res.json(puzzleList);
 	} catch (error) {
 		console.log(error);
 		res.status(500).send();
 	}
 });
+
 apiRouter.get(
 	"/puzzles/:puzzleName/:puzzleId",
 	verifyToken,
@@ -221,24 +227,29 @@ function verifyInstructorPW(req, res, next) {
 }
 
 async function getPuzzle(puzzleName, puzzleId, student) {
-	const Puzzle = puzzles[puzzleName];
-	let puzzle = await Puzzle.findOne({
-		puzzleId,
-		student: student._id,
-	});
-	if (!puzzle) {
-		puzzle = await Puzzle.findOne({
+	try {
+		const Puzzle = puzzles[puzzleName];
+		let puzzle = await Puzzle.findOne({
 			puzzleId,
-			default: true,
+			student: student._id,
 		});
-		puzzle._id = new ObjectID();
-		puzzle.student = student._id;
-		puzzle.default = false;
-		puzzle.isNew = true;
-		await puzzle.save();
-	}
+		if (!puzzle) {
+			puzzle = await Puzzle.findOne({
+				puzzleId,
+				default: true,
+			});
+			puzzle._id = new ObjectID();
+			puzzle.student = student._id;
+			puzzle.default = false;
+			puzzle.isNew = true;
+			await puzzle.save();
+		}
 
-	return puzzle;
+		return puzzle;
+	} catch (error) {
+		console.log({ puzzleName, puzzleId, student });
+		throw error;
+	}
 }
 
 module.exports = apiRouter;
