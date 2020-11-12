@@ -90,7 +90,7 @@ describe("student client", () => {
 		);
 		done();
 	});
-	it("getting test puzzle work requires auth", async (done) => {
+	xit("getting test puzzle work requires auth", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
 		await request(app)
 			.post("/api/students/")
@@ -98,7 +98,7 @@ describe("student client", () => {
 			.send(JSON.stringify(student));
 		request(app).get("/api/puzzles/Test/0").expect(403, done);
 	});
-	it("putting test puzzle work requires auth", async (done) => {
+	xit("putting test puzzle work requires auth", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
 		const puzzleData = { solved: true };
 		await request(app)
@@ -111,7 +111,7 @@ describe("student client", () => {
 			.send(puzzleData)
 			.expect(403, done);
 	});
-	it("get default puzzle work", async (done) => {
+	xit("get default puzzle work", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
 		const login = await request(app)
 			.post("/api/students")
@@ -129,7 +129,7 @@ describe("student client", () => {
 		expect(response.body.work).toMatchObject(defaultData);
 		done();
 	});
-	it("putting test puzzle work", async (done) => {
+	xit("putting test puzzle work", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
 		const login = await request(app)
 			.post("/api/students/")
@@ -146,7 +146,7 @@ describe("student client", () => {
 			.expect(200 /*done*/);
 		done();
 	});
-	it("getting test puzzle work after change", async (done) => {
+	xit("getting test puzzle work after change", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
 		const login = await request(app)
 			.post("/api/students/")
@@ -402,7 +402,7 @@ describe("student client", () => {
 
 	it("getting non-active puzzle", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
-		const login = await request(app)
+		await request(app)
 			.post("/api/students/")
 			.type("application/json")
 			.send(JSON.stringify(student));
