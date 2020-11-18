@@ -2,7 +2,8 @@ const express = require("express");
 const request = require("supertest");
 const jwt = require("jsonwebtoken");
 const { dbSetup, dbTeardown } = require("../mongoConfigTesting");
-const { populateTestDB } = require("../populatedb.js");
+const { populateDB } = require("../populatedb.js");
+const calcudokuDefaults = require("../defaults/calcudoku").testDefaults;
 
 const apiRouter = require("./api");
 
@@ -14,7 +15,10 @@ app.use("/api", apiRouter);
 
 beforeEach(async () => {
 	await dbSetup();
-	await populateTestDB();
+	await populateDB({
+		studentDefaults: [],
+		puzzleDefaults: [...calcudokuDefaults],
+	});
 });
 
 afterEach(dbTeardown);
@@ -90,7 +94,7 @@ describe("student client", () => {
 		);
 		done();
 	});
-	xit("getting test puzzle work requires auth", async (done) => {
+	it("getting test puzzle work requires auth", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
 		await request(app)
 			.post("/api/students/")
@@ -98,7 +102,7 @@ describe("student client", () => {
 			.send(JSON.stringify(student));
 		request(app).get("/api/puzzles/Test/0").expect(403, done);
 	});
-	xit("putting test puzzle work requires auth", async (done) => {
+	it("putting test puzzle work requires auth", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
 		const puzzleData = { solved: true };
 		await request(app)
@@ -111,7 +115,7 @@ describe("student client", () => {
 			.send(puzzleData)
 			.expect(403, done);
 	});
-	xit("get default puzzle work", async (done) => {
+	/*	xit("get default puzzle work", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
 		const login = await request(app)
 			.post("/api/students")
@@ -143,7 +147,7 @@ describe("student client", () => {
 			.set("authorization", login.body.token)
 			.type("json")
 			.send({ puzzleData })
-			.expect(200 /*done*/);
+			.expect(200);
 		done();
 	});
 	xit("getting test puzzle work after change", async (done) => {
@@ -168,7 +172,7 @@ describe("student client", () => {
 			.expect(200);
 		expect(response.body.work).toMatchObject(puzzleData);
 		done();
-	});
+	});*/
 	it("get default sample calcudoku", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
 		const login = await request(app)
