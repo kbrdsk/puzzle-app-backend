@@ -10,8 +10,7 @@ module.exports.defaults = [
 ];
 
 
-//test defaults
-/*module.exports.defaults = [
+module.exports.testDefaults = [
 {
 		default: true,
 		populateID: "calcudoku-1",
@@ -195,4 +194,4 @@ module.exports.defaults = [
 				],
 			},
 		],
-	},]*/
+	},]
