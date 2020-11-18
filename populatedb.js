@@ -1,10 +1,10 @@
 const Student = require("./models/student");
 const PuzzleIndex = require("./models/puzzles/index");
-const studentDefaults = require("./defaults/students").defaults;
-const calcudokuDefaults = require("./defaults/calcudoku").defaults;
-const logicDefaults = require("./defaults/logic").defaults;
 
-module.exports.populateTestDB = async (mongoDB) => {
+module.exports.populateDB = async (
+	{ puzzleDefaults, studentDefaults },
+	mongoDB
+) => {
 	if (mongoDB) {
 		const mongoose = require("mongoose");
 		mongoose.connect(mongoDB, { useNewUrlParser: true });
@@ -41,7 +41,7 @@ module.exports.populateTestDB = async (mongoDB) => {
 
 	const studentData = () => studentDefaults;
 
-	const puzzleData = () => [...calcudokuDefaults, ...logicDefaults];
+	const puzzleData = () => puzzleDefaults;
 
 	try {
 		await Promise.all(studentData().map(createStudent));
