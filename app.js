@@ -7,12 +7,12 @@ const compression = require("compression");
 
 const apiRouter = require("./routes/api");
 
-const { dbSetup } = require("./mongoConfigTesting");
 const { populateTestDB } = require("./populatedb");
 
 const app = express();
 
 if (process.env.NODE_ENV === "development") {
+	const { dbSetup } = require("./mongoConfigTesting");
 	dbSetup().then(populateTestDB);
 } else {
 	require("./mongoConfig");
