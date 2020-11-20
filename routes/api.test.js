@@ -115,64 +115,6 @@ describe("student client", () => {
 			.send(puzzleData)
 			.expect(403, done);
 	});
-	/*	xit("get default puzzle work", async (done) => {
-		const student = { first: "kabirdas", last: "henry" };
-		const login = await request(app)
-			.post("/api/students")
-			.type("application/json")
-			.send(JSON.stringify(student));
-
-		const defaultData = { solved: false };
-
-		const response = await request(app)
-			.get("/api/puzzles/Test/0")
-			.set("authorization", login.body.token)
-			.expect(200)
-			.expect("Content-Type", /json/);
-
-		expect(response.body.work).toMatchObject(defaultData);
-		done();
-	});
-	xit("putting test puzzle work", async (done) => {
-		const student = { first: "kabirdas", last: "henry" };
-		const login = await request(app)
-			.post("/api/students/")
-			.type("application/json")
-			.send(JSON.stringify(student));
-
-		const puzzleData = { solved: true };
-
-		await request(app)
-			.put("/api/puzzles/Test/0")
-			.set("authorization", login.body.token)
-			.type("json")
-			.send({ puzzleData })
-			.expect(200);
-		done();
-	});
-	xit("getting test puzzle work after change", async (done) => {
-		const student = { first: "kabirdas", last: "henry" };
-		const login = await request(app)
-			.post("/api/students/")
-			.type("application/json")
-			.send(JSON.stringify(student));
-
-		const puzzleData = { solved: true };
-
-		await request(app)
-			.put("/api/puzzles/Test/0")
-			.set("authorization", login.body.token)
-			.type("json")
-			.send({ puzzleData })
-			.expect(200);
-		const response = await request(app)
-			.get("/api/puzzles/Test/0")
-			.set("authorization", login.body.token)
-			.expect("Content-Type", /json/)
-			.expect(200);
-		expect(response.body.work).toMatchObject(puzzleData);
-		done();
-	});*/
 	it("get default sample calcudoku", async (done) => {
 		const student = { first: "kabirdas", last: "henry" };
 		const login = await request(app)
@@ -427,6 +369,33 @@ describe("student client", () => {
 				"size",
 				"student",
 			])
+		);
+
+		done();
+	});
+
+	it("can get all student data", async (done) => {
+		const student = { first: "kabirdas", last: "henry" };
+		const {
+			body: { token },
+		} = await request(app)
+			.post("/api/students/")
+			.type("application/json")
+			.send(JSON.stringify(student));
+
+		const response = await request(app)
+			.get("/api/data")
+			.set("authorization", token);
+
+		expect(Object.keys(response.body)).toEqual(
+			expect.arrayContaining(["calcudoku", "logic"])
+		);
+		expect(
+			response.body.calcudoku.map((puzzle) => puzzle.puzzleId)
+		).toEqual(
+			expect.arrayContaining(
+				calcudokuDefaults.map((puzzle) => puzzle.puzzleId)
+			)
 		);
 
 		done();

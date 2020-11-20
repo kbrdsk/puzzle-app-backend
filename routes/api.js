@@ -114,6 +114,34 @@ apiRouter.get(
 	}
 );
 
+apiRouter.get("/data", verifyToken, async (req, res) => {
+	try {
+		const { _id } = req.student;
+		const student = await Student.findOne({ _id });
+		if (!student) {
+			res.status(404).send("Student not found.");
+		} else {
+			const data = {};
+			for (let puzzleName in puzzles) {
+				const Puzzle = puzzles[puzzleName];
+				const defaults = await Puzzle.find(
+					{ default: true },
+					"puzzleId"
+				);
+				data[puzzleName] = await Promise.all(
+					defaults.map(({ puzzleId }) =>
+						getPuzzle(puzzleName, puzzleId, student)
+					)
+				);
+			}
+			res.json(data);
+		}
+	} catch (error) {
+		console.log(error);
+		res.status(500).send();
+	}
+});
+
 apiRouter.put("/activepuzzle", verifyToken, async (req, res) => {
 	try {
 		const student = await Student.findOne({ _id: req.student._id });
