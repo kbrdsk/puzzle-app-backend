@@ -25,6 +25,7 @@ const PuzzleSchema = new Schema({
 	width: Number,
 	selectionProximity: Number,
 	stickLength: Number,
+	stickWidth: Number,
 	offset: Number,
 	description: String,
 	source: String,
