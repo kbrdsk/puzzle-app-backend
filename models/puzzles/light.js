@@ -24,6 +24,7 @@ const PuzzleSchema = new Schema({
 	neighborType: String,
 	source: String,
 	default: Boolean,
+	hasCompleted: Boolean,
 });
 
 module.exports = mongoose.model("Light", PuzzleSchema);

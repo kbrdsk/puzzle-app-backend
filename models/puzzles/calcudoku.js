@@ -30,6 +30,7 @@ const PuzzleSchema = new Schema({
 	],
 	source: String,
 	default: Boolean,
+	hasCompleted: Boolean,
 });
 
 module.exports = mongoose.model("Calcudoku", PuzzleSchema);
