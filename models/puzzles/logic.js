@@ -10,7 +10,7 @@ const PuzzleSchema = new Schema({
   description: String,
 	source: String,
 	default: Boolean,
-	hasCompleted: Boolean,
+	completed: Boolean,
 });
 
 module.exports = mongoose.model("Logic", PuzzleSchema);
