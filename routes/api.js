@@ -200,6 +200,30 @@ apiRouter.get(
 	}
 );
 
+apiRouter.put(
+	"/puzzles/:puzzleName/:puzzleId/completed",
+	verifyToken,
+	async (req, res) => {
+		try {
+			const { puzzleName, puzzleId } = req.params;
+			const student = await Student.findOne({ _id: req.student._id });
+			if (!student) {
+				res.status(404).send("Student not found.");
+			}
+			let puzzle = await getPuzzle(puzzleName, puzzleId, student);
+			puzzle = await puzzles[puzzleName].findByIdAndUpdate(
+				puzzle._id,
+				{ completed: req.body.completed },
+				{ new: true }
+			);
+			res.json(puzzle);
+		} catch (error) {
+			console.log(error);
+			res.status(500).send();
+		}
+	}
+);
+
 apiRouter.get(
 	"/puzzles/:puzzleName/:puzzleId",
 	verifyToken,
