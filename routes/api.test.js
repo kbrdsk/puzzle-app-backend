@@ -400,4 +400,126 @@ describe("student client", () => {
 
 		done();
 	});
+
+	it("gets puzzle completed status from student side", async (done) => {
+		const student = { first: "kabirdas", last: "henry" };
+		const {
+			body: { token },
+		} = await request(app)
+			.post("/api/students/")
+			.type("application/json")
+			.send(JSON.stringify(student));
+
+		await request(app)
+			.get("/api/puzzles/calcudoku/sample/completed")
+			.set("authorization", token)
+			.expect(200);
+
+		done();
+	});
+
+	it("puts puzzle completed status from student side", async (done) => {
+		const student = { first: "kabirdas", last: "henry" };
+		const {
+			body: { token },
+		} = await request(app)
+			.post("/api/students/")
+			.type("application/json")
+			.send(JSON.stringify(student));
+
+		await request(app)
+			.put("/api/puzzles/calcudoku/sample/completed")
+			.set("authorization", token)
+			.type("application/json")
+			.send(JSON.stringify({ completed: true }))
+			.expect(200);
+
+		const response1 = await request(app)
+			.get("/api/puzzles/calcudoku/sample/completed")
+			.set("authorization", token)
+			.expect(200);
+
+		expect(response1.body.completed).toBe(true);
+
+		await request(app)
+			.put("/api/puzzles/calcudoku/sample/completed")
+			.set("authorization", token)
+			.type("application/json")
+			.send(JSON.stringify({ completed: false }))
+			.expect(200);
+
+		const response2 = await request(app)
+			.get("/api/puzzles/calcudoku/sample/completed")
+			.set("authorization", token)
+			.expect(200);
+
+		expect(response2.body.completed).toBe(false);
+
+		done();
+	});
+
+	it("gets puzzle completed status from instructor side", async (done) => {
+		const student = { first: "kabirdas", last: "henry" };
+		await request(app)
+			.post("/api/students/")
+			.type("application/json")
+			.send(JSON.stringify(student));
+
+		const response = await request(app)
+			.get(
+				`/api/students/${student.first}_${student.last}` +
+					`/calcudoku/sample/completed`
+			)
+			.set("authorization", process.env.INSTRUCTOR_PW);
+
+		expect(response.ok).toBe(true);
+
+		done();
+	});
+
+	it("puts puzzle completed status from instructor side", async (done) => {
+		const student = { first: "kabirdas", last: "henry" };
+		await request(app)
+			.post("/api/students/")
+			.type("application/json")
+			.send(JSON.stringify(student));
+
+		await request(app)
+			.put(
+				`/api/students/${student.first}_${student.last}` +
+					`/calcudoku/sample/completed`
+			)
+			.set("authorization", process.env.INSTRUCTOR_PW)
+			.type("application/json")
+			.send(JSON.stringify({ completed: true }));
+
+		const response1 = await request(app)
+			.get(
+				`/api/students/${student.first}_${student.last}` +
+					`/calcudoku/sample/completed`
+			)
+			.set("authorization", process.env.INSTRUCTOR_PW);
+
+		expect(response1.body.completed).toBe(true);
+
+		await request(app)
+			.put(
+				`/api/students/${student.first}_${student.last}` +
+					`/calcudoku/sample/completed`
+			)
+			.set("authorization", process.env.INSTRUCTOR_PW)
+			.type("application/json")
+			.send(JSON.stringify({ completed: false }));
+
+		const response2 = await request(app)
+			.get(
+				`/api/students/${student.first}_${student.last}` +
+					`/calcudoku/sample/completed`
+			)
+			.set("authorization", process.env.INSTRUCTOR_PW);
+
+		expect(response2.body.completed).toBe(false);
+
+		done();
+	});
 });
