@@ -176,22 +176,29 @@ apiRouter.delete("/activepuzzle", verifyToken, async (req, res) => {
 	}
 });
 
-apiRouter.get("/puzzles/:puzzleName", async (req, res) => {
-	try {
-		const { puzzleName } = req.params;
-		const defaults = await puzzles[puzzleName].find(
-			{ default: true },
-			"puzzleId title"
-		);
-		const puzzleList = defaults.map(({ puzzleId, title }) => {
-			return { instance: puzzleId, title };
-		});
-		res.json(puzzleList);
-	} catch (error) {
-		console.log(error);
-		res.status(500).send();
+apiRouter.get(
+	"/puzzles/:puzzleName/:puzzleId/completed",
+	verifyToken,
+	async (req, res) => {
+		try {
+			const { puzzleName, puzzleId } = req.params;
+			const student = await Student.findOne({ _id: req.student._id });
+			if (!student) {
+				res.status(404).send("Student not found.");
+			} else {
+				const { completed } = await getPuzzle(
+					puzzleName,
+					puzzleId,
+					student
+				);
+				res.json({ completed });
+			}
+		} catch (error) {
+			console.log(error);
+			res.status(500).send();
+		}
 	}
-});
+);
 
 apiRouter.get(
 	"/puzzles/:puzzleName/:puzzleId",
@@ -212,6 +219,24 @@ apiRouter.get(
 		}
 	}
 );
+
+apiRouter.get("/puzzles/:puzzleName", async (req, res) => {
+	try {
+		const { puzzleName } = req.params;
+		const defaults = await puzzles[puzzleName].find(
+			{ default: true },
+			"puzzleId title"
+		);
+		const puzzleList = defaults.map(({ puzzleId, title }) => {
+			return { instance: puzzleId, title };
+		});
+		res.json(puzzleList);
+	} catch (error) {
+		console.log(error);
+		res.status(500).send();
+	}
+});
+
 apiRouter.put(
 	"/puzzles/:puzzleName/:puzzleId",
 	verifyToken,
