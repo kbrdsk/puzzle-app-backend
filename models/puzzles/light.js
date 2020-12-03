@@ -21,6 +21,7 @@ const PuzzleSchema = new Schema({
 			row: { type: Number, required: true },
 		},
 	],
+	neighborType: String,
 	source: String,
 	default: Boolean,
 });
