@@ -155,7 +155,7 @@ apiRouter.get(
 				res.status(404).send("Student not found.");
 			} else {
 				const defaults = await puzzles[puzzleName].find(
-					{ default: true },
+					{ student },
 					"puzzleId completed"
 				);
 				const completionStatus = {};
