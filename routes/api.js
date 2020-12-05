@@ -144,6 +144,34 @@ apiRouter.put(
 );
 
 apiRouter.get(
+	"/students/:studentID/:puzzleName/completed",
+	verifyInstructorPW,
+	async (req, res) => {
+		try {
+			const { puzzleName, studentID } = req.params;
+			const [, first, last] = studentID.match(/^(.*)_(.*)$/);
+			const student = await Student.findOne({ first, last });
+			if (!student) {
+				res.status(404).send("Student not found.");
+			} else {
+				const defaults = await puzzles[puzzleName].find(
+					{ default: true },
+					"puzzleId completed"
+				);
+				const completionStatus = {};
+				defaults.forEach(({ puzzleId, completed }) => {
+					completionStatus[puzzleId] = completed || false;
+				});
+				res.json(completionStatus);
+			}
+		} catch (error) {
+			console.log(error);
+			res.status(500).send();
+		}
+	}
+);
+
+apiRouter.get(
 	"/students/:studentID/:puzzleName/:puzzleId",
 	verifyInstructorPW,
 	async (req, res) => {

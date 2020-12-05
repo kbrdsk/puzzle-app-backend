@@ -522,4 +522,23 @@ describe("student client", () => {
 
 		done();
 	});
+
+	it("gets puzzle list of completed status from instructor side", async (done) => {
+		const student = { first: "kabirdas", last: "henry" };
+		await request(app)
+			.post("/api/students/")
+			.type("application/json")
+			.send(JSON.stringify(student));
+
+		const response = await request(app)
+			.get(
+				`/api/students/${student.first}_${student.last}` +
+					`/calcudoku/completed`
+			)
+			.set("authorization", process.env.INSTRUCTOR_PW);
+
+		expect(response.ok).toBe(true);
+		expect(response.body.sample).toBe(false);
+		done();
+	});
 });
