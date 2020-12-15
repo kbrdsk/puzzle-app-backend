@@ -3,4 +3,5 @@ module.exports = {
 	logic: require("./logic"),
 	light: require("./light"),
 	matchstick: require("./matchstick"),
+	tangram: require("./tangram"),
 };
